@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="1.66.0" />
+  </ItemGroup>
+</Project>
