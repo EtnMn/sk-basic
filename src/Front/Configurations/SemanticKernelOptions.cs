@@ -12,4 +12,7 @@ public sealed class SemanticKernelOptions
     [Required]
     [Url]
     public required string Endpoint { get; set; }
+
+    [Required]
+    public required string DeploymentName { get; set; }
 }
