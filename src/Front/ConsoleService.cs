@@ -14,11 +14,13 @@ public sealed class ConsoleService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("ConsoleService started.");
-        FunctionResult result = await kernel.InvokePromptAsync(
-            "Write a haiku about Semantic Kernel.",
-            cancellationToken: stoppingToken);
+        logger.LogInformation("Console started.");
 
-        Console.WriteLine("Result: {0}", result);
+        FunctionResult text = await kernel.InvokePromptAsync("Introduce the current date.", cancellationToken: stoppingToken);
+
+        KernelFunction dateFunction = kernel.Plugins[Plugins.DatePlugin.Key]["get_utc_now_date"];
+        FunctionResult date = await kernel.InvokeAsync(dateFunction, cancellationToken: stoppingToken);
+
+        Console.WriteLine("{0}. Date: {1}", text, date);
     }
 }

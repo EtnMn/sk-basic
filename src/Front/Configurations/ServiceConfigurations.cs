@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using SK.Basic.Front.Plugins;
 
 namespace SK.Basic.Front.Configurations;
 
@@ -18,9 +19,9 @@ public static class ServiceConfigurations
             string endpoint = options.Value.Endpoint;
             string modelId = options.Value.DeploymentName;
 
-            builder.Services.AddLogging();
-
             builder.AddAzureOpenAIChatCompletion(modelId, endpoint, openAiKey);
+
+            builder.Plugins.AddFromType<DatePlugin>(DatePlugin.Key);
 
             return builder.Build();
         });
