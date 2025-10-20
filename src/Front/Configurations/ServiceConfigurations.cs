@@ -21,9 +21,15 @@ public static class ServiceConfigurations
 
             builder.AddAzureOpenAIChatCompletion(modelId, endpoint, openAiKey);
 
-            builder.Plugins.AddFromType<DatePlugin>(DatePlugin.Key);
+            // Option 1: Add plugin from type.
+            // builder.Plugins.AddFromType<DatePlugin>(DatePlugin.Key);
 
-            return builder.Build();
+            Kernel kernel = builder.Build();
+
+            // Option 2: Add plugin from object.
+            kernel.ImportPluginFromObject(new DatePlugin(), DatePlugin.Key);
+
+            return kernel;
         });
 
         services.AddHostedService<ConsoleService>();

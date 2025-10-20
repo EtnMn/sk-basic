@@ -18,13 +18,11 @@ public sealed class ConsoleService(
     {
         logger.LogInformation("Console started.");
 
+        // Invoke basic prompt.
+        FunctionResult intro = await kernel.InvokePromptAsync("Introduce yourself.", cancellationToken: stoppingToken);
+
+        // Create a semantic function from a prompt.
         string prompt = await File.ReadAllTextAsync("Prompts/historical_fact_today.txt", stoppingToken);
-
-        // Create a classic function.
-        KernelFunction dateFunction = kernel.Plugins[Plugins.DatePlugin.Key]["get_utc_now_date"];
-        FunctionResult date = await kernel.InvokeAsync(dateFunction, cancellationToken: stoppingToken);
-
-        // Create a semantic function from the prompt.
         KernelFunction factFunction = KernelFunctionFactory.CreateFromPrompt(
             prompt,
             executionSettings: new AzureOpenAIPromptExecutionSettings()
@@ -34,14 +32,28 @@ public sealed class ConsoleService(
                 TopP = 0.7,
             });
 
+        // Create a classic function.
+        KernelFunction dateFunction = kernel.Plugins[Plugins.DatePlugin.Key]["get_utc_now_date"];
+        FunctionResult date = await kernel.InvokeAsync(dateFunction, cancellationToken: stoppingToken);
         FunctionResult text = await kernel.InvokeAsync(
             factFunction,
             new KernelArguments() { ["today"] = date },
             cancellationToken: stoppingToken);
 
-        // Invoke basic prompt.
-        FunctionResult intro = await kernel.InvokePromptAsync("Introduce yourself.", cancellationToken: stoppingToken);
+        Console.WriteLine("{0} {1}", intro.GetValue<string>(), text.GetValue<string>());
+        Console.WriteLine("---");
 
-        Console.WriteLine("{0} {1}", intro, text);
+        // Invoke prompt with auto function choice behavior.
+        PromptExecutionSettings settings = new()
+        {
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
+        };
+
+        FunctionResult resultPromptFunction = await kernel.InvokePromptAsync(
+            prompt,
+            new(settings),
+            cancellationToken: stoppingToken);
+
+        Console.WriteLine("{0}", resultPromptFunction.GetValue<string>());
     }
 }
